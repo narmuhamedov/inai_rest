@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -14,10 +15,19 @@ class Product(models.Model):
     price = models.FloatField()
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
+
+    @property
+    def count_reviews(self):
+        return self.reviews.all().count()
+
+    @property
+    def all_reviews(self):
+        reviews = Review.objects.filter(product=self)
+        return [{'id': i.id, 'text': i.text} for i in reviews]
 
 
 class Review(models.Model):
